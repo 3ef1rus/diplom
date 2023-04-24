@@ -5,6 +5,7 @@ import nltk
 import sys
 import pyautogui
 import subprocess
+import webbrowser
 
 from pathlib import Path
 nltk.download('punkt')
@@ -26,6 +27,13 @@ class MyCustomError(Exception):
 def speak(text):
     engine.say(text)
     engine.runAndWait()
+
+def searchInBrows(text=""):
+    if text=="":
+        webbrowser.open('https://www.google.com')
+    else :
+        url = f"https://www.google.com/search?q={text}"
+        webbrowser.open(url)
 
 def restart_program():
     """Перезагружает текущую программу."""
@@ -202,7 +210,8 @@ while True:
                     if tag == 'NN':
                         x=word
                         createFile("txt",x)
-        createFile("txt")
+                        break
+        else:createFile("txt")
     
     elif "создай word на рабочем столе" in text.lower():
         speak("Хорошо сейчас сделаю.")
@@ -222,7 +231,8 @@ while True:
                     if tag == 'NN':
                         x=word
                         createFile("xlsx",x)
-        createFile("xlsx")    
+                        break
+        else:createFile("xlsx")    
     
     elif "создай папку на рабочем столе" in text.lower():
         speak("Хорошо сейчас сделаю.")
@@ -240,7 +250,18 @@ while True:
                     if tag == 'NN':
                         x=word
                         createFile("pptx",x)
-        createFile("pptx")  
+                        break
+        else:createFile("pptx")  
+        
+    elif "открой google" in text.lower():
+        speak("Хорошо сейчас сделаю.")
+        if "и найди" in text.lower():           
+            string=text.lower()
+            idx=string.find("найди")
+            second_half = string[idx + len("world"):].strip()
+            searchInBrows(second_half)
+            break
+        else:searchInBrows()                  
         
     elif "открой калькулятор" in text.lower():
         speak("Хорошо сейчас сделаю.")
@@ -271,12 +292,10 @@ while True:
         speak("Хорошо сейчас сделаю.")
         
     elif "сделай звук на максимум" in text.lower():
-        
         speak("Хорошо сейчас сделаю.")
         changeVolumeM()
         
     elif "сверни все окна" in text.lower():
-        
         speak("Хорошо сейчас сделаю.")
         pyautogui.minimizeAllWindows()
         
@@ -286,7 +305,6 @@ while True:
      
     elif "перезагрузись" in text.lower():
         speak("Хорошо сейчас сделаю.")
-        
         restart_program()
     
     elif "открой bluetooth" in text.lower():
