@@ -195,8 +195,6 @@ while True:
     elif "спасибо" in text.lower():
         speak("Всегда пожалуйста.")
         
-        
-        
     elif "создай блокнот на рабочем столе" in text.lower():
         speak("Хорошо сейчас сделаю.")
         if "с названием" in text.lower():           
@@ -235,7 +233,6 @@ while True:
                         createFolder(x)
         else:createFolder("")                
                 
-              
     elif "создай презентацию на рабочем столе" in text.lower():
         speak("Хорошо сейчас сделаю.")
         if "с названием" in text.lower():           
@@ -291,8 +288,11 @@ while True:
         speak("Хорошо сейчас сделаю.")
         
         restart_program()
+    
+    elif "открой bluetooth" in text.lower():
+        speak("Хорошо сейчас сделаю.")
+        subprocess.Popen('explorer.exe shell:::{28803F59-3A75-4058-995F-4EE5503B023C}')
         
-          
     elif "стоп" in text.lower():
         speak("До свидания.")
         break
