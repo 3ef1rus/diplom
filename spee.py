@@ -4,6 +4,7 @@ import os
 import nltk
 import pyautogui
 import subprocess
+from pathlib import Path
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 nltk.download('averaged_perceptron_tagger')
@@ -15,6 +16,9 @@ r = sr.Recognizer()
 i=0
 # создаем объект для синтеза речи
 engine = pyttsx3.init()
+
+class MyCustomError(Exception):
+    pass
 
 # функция для преобразования текста в речь
 def speak(text):
@@ -70,29 +74,38 @@ def MuteVolume():
 
 def createFile(x,name="file"):
      # Получаем путь к рабочему столу пользователя
-        desktop_path = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
+        desktop_path = Path.home() / "Desktop"
         # Указываем имя файла и его расширение
         if x=="doc":
-            filename = name+'.doc'
-        if x=="txt":
-            filename = name+'.txt'
-        if x=="pptx":
-            filename = name+'.pptx'
-        if x=="xlsx":
-            filename = name+'.xlsx'
+            name=f'{name}.doc'
+            file_path = desktop_path / name
+        elif x=="txt":
+            name=f'{name}.txt'
+            file_path = desktop_path / name
+        elif x=="pptx":
+            name=f'{name}.pptx'
+            file_path = desktop_path / name
+        elif x=="xlsx":
+            name=f'{name}.xlsx'
+            file_path = desktop_path / name
+            
 
         # Создаем пустой файл на рабочем столе
         try:
-            with open(os.path.join(desktop_path, filename), 'w') as file:
-                pass               
-        except :            
+            if file_path.exists():
+              raise MyCustomError("Файл с таким названием уже существует")
+            else: file_path.touch()          
+        except MyCustomError:    
             i = 1
             while True:
-                new_filename = f"{i}_{filename}"
+                new_file_path = desktop_path / f'{i}_{name}'
                 try:
-                    open(os.path.join(desktop_path, new_filename), 'w')
+                    if new_file_path.exists():
+                        raise MyCustomError("Файл с таким названием уже существует")
+                    else: new_file_path.touch()  
+                    file_path = new_file_path
                     break
-                except :
+                except MyCustomError:
                     i += 1
 
 def createFolder(x):
@@ -178,7 +191,7 @@ while True:
     elif "создай блокнот на рабочем столе" in text.lower():
         speak("Хорошо сейчас сделаю.")
         if "с названием" in text.lower():           
-            for word, tag in tags:
+            for word, tag in reversed(tags):
                     if tag == 'NN':
                         x=word
                         createFile("txt",x)
@@ -187,17 +200,18 @@ while True:
     elif "создай word на рабочем столе" in text.lower():
         speak("Хорошо сейчас сделаю.")
         if "с названием" in text.lower():           
-            for word, tag in tags:
+            for word, tag in reversed(tags):
                     if tag == 'NN':
                         x=word
                         createFile("doc",x)
-        createFile("doc")
+                        break
+        else: createFile("doc")
         
     elif "создай excel на рабочем столе" in text.lower():
         speak("Хорошо сейчас сделаю.")
 
         if "с названием" in text.lower():           
-            for word, tag in tags:
+            for word, tag in reversed(tags):
                     if tag == 'NN':
                         x=word
                         createFile("xlsx",x)
@@ -216,7 +230,7 @@ while True:
     elif "создай презентацию на рабочем столе" in text.lower():
         speak("Хорошо сейчас сделаю.")
         if "с названием" in text.lower():           
-            for word, tag in tags:
+            for word, tag in reversed(tags):
                     if tag == 'NN':
                         x=word
                         createFile("pptx",x)
