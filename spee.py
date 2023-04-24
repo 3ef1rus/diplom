@@ -313,4 +313,4 @@ while True:
         
     elif "стоп" in text.lower():
         speak("До свидания.")
-        break
+        sys.exit(0)
