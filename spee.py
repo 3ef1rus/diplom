@@ -2,8 +2,10 @@ import speech_recognition as sr
 import pyttsx3
 import os
 import nltk
+import sys
 import pyautogui
 import subprocess
+
 from pathlib import Path
 nltk.download('punkt')
 from nltk.tokenize import word_tokenize
@@ -24,6 +26,11 @@ class MyCustomError(Exception):
 def speak(text):
     engine.say(text)
     engine.runAndWait()
+
+def restart_program():
+    """Перезагружает текущую программу."""
+    script_path = os.path.realpath(__file__)
+    subprocess.call(['python', script_path])
 
 def changeVolumeMIN(x):
     # Получение всех устройств воспроизведения звука
@@ -188,6 +195,8 @@ while True:
     elif "спасибо" in text.lower():
         speak("Всегда пожалуйста.")
         
+        
+        
     elif "создай блокнот на рабочем столе" in text.lower():
         speak("Хорошо сейчас сделаю.")
         if "с названием" in text.lower():           
@@ -275,10 +284,14 @@ while True:
         pyautogui.minimizeAllWindows()
         
     elif "выключи звук" in text.lower():
-        
         speak("Хорошо сейчас сделаю.")
         MuteVolume()
-             
+     
+    elif "перезагрузись" in text.lower():
+        speak("Хорошо сейчас сделаю.")
+        
+        restart_program()
+        
           
     elif "стоп" in text.lower():
         speak("До свидания.")
