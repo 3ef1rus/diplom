@@ -6,6 +6,8 @@ import sys
 import pyautogui
 import subprocess
 import webbrowser
+import random
+import keyboard
 
 from pathlib import Path
 nltk.download('punkt')
@@ -33,6 +35,13 @@ def searchInBrows(text=""):
         webbrowser.open('https://www.google.com')
     else :
         url = f"https://www.google.com/search?q={text}"
+        webbrowser.open(url)
+        
+def searchVideo(text=""):
+    if text=="":
+        webbrowser.open('https://www.youtube.com')
+    else :
+        url = f"https://www.youtube.com/search?q={text}"
         webbrowser.open(url)
 
 def restart_program():
@@ -186,6 +195,11 @@ def recognize_speech():
         print(f"Ошибка: {e}")
         return ""
 
+def choseSayOK():
+    my_list = ["Хорошо сейчас сделаю", "Сейчас", "Хорошо", "Угу", "Секунду","Готово","В процессе","Сделаю","Уже делаю"]
+    random_element = random.choice(my_list)
+    speak(random_element)
+
 # основной цикл работы голосового помощника
 while True:
     # распознаем речь пользователя
@@ -204,7 +218,7 @@ while True:
         speak("Всегда пожалуйста.")
         
     elif "создай блокнот на рабочем столе" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         if "с названием" in text.lower():           
             for word, tag in reversed(tags):
                     if tag == 'NN':
@@ -214,7 +228,7 @@ while True:
         else:createFile("txt")
     
     elif "создай word на рабочем столе" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         if "с названием" in text.lower():           
             for word, tag in reversed(tags):
                     if tag == 'NN':
@@ -224,7 +238,7 @@ while True:
         else: createFile("doc")
         
     elif "создай excel на рабочем столе" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
 
         if "с названием" in text.lower():           
             for word, tag in reversed(tags):
@@ -235,7 +249,7 @@ while True:
         else:createFile("xlsx")    
     
     elif "создай папку на рабочем столе" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         if "с названием" in text.lower():           
             for word, tag in tags:
                     if tag == 'NN':
@@ -244,7 +258,7 @@ while True:
         else:createFolder("")                
                 
     elif "создай презентацию на рабочем столе" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         if "с названием" in text.lower():           
             for word, tag in reversed(tags):
                     if tag == 'NN':
@@ -254,63 +268,78 @@ while True:
         else:createFile("pptx")  
         
     elif "открой google" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         if "и найди" in text.lower():           
             string=text.lower()
             idx=string.find("найди")
-            second_half = string[idx + len("world"):].strip()
+            second_half = string[idx + len("найди"):].strip()
             searchInBrows(second_half)
             break
-        else:searchInBrows()                  
+        else:searchInBrows()    
+        
+    elif "открой youtube" in text.lower():
+        choseSayOK()
+        if "и найди" in text.lower():           
+            string=text.lower()
+            idx=string.find("найди")
+            second_half = string[idx + len("найди"):].strip()
+            searchVideo(second_half)
+            break
+        else:searchVideo()                   
         
     elif "открой калькулятор" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         subprocess.Popen('calc.exe')     
         
     elif "сделай тише" in text.lower():
         for word, tag in tags:
             if tag == 'CD':
                 changeVolumeMIN(int(word)/100)
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         
     elif "сделай потише" in text.lower():
         for word, tag in tags:
             if tag == 'CD':
                 changeVolumeMIN(int(word)/100)
-        speak("Хорошо сейчас сделаю.")    
+        choseSayOK()    
               
     elif "сделай громче" in text.lower():
         for word, tag in tags:
             if tag == 'CD':
                 changeVolumeMAX(int(word)/100)
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
 
     elif "сделай погромче" in text.lower():
         for word, tag in tags:
             if tag == 'CD':
                 changeVolumeMAX(int(word)/100)
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         
     elif "сделай звук на максимум" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         changeVolumeM()
         
     elif "сверни все окна" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         pyautogui.minimizeAllWindows()
         
     elif "выключи звук" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         MuteVolume()
      
     elif "перезагрузись" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         restart_program()
     
     elif "открой bluetooth" in text.lower():
-        speak("Хорошо сейчас сделаю.")
+        choseSayOK()
         subprocess.Popen('explorer.exe shell:::{28803F59-3A75-4058-995F-4EE5503B023C}')
-        
+                   
+    elif "поменяй язык на клавиатуре" in text.lower():
+        choseSayOK()
+        keyboard.press_and_release('alt+shift')   
+    
+            
     elif "стоп" in text.lower():
         speak("До свидания.")
         sys.exit(0)
