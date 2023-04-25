@@ -2,12 +2,13 @@ import speech_recognition as sr
 import pyttsx3
 import os
 import nltk
-import sys
 import pyautogui
 import subprocess
 import webbrowser
 import random
 import keyboard
+import ctypes
+import time
 
 from pathlib import Path
 nltk.download('punkt')
@@ -176,7 +177,10 @@ def createFolder(x):
                     break
                 except FileExistsError:
                     i += 1                
-    
+ 
+def killProg():
+    time.sleep(2)
+    ctypes.windll.kernel32.ExitProcess(0)
 # функция для распознавания речи
 def recognize_speech():
     with sr.Microphone() as source:
@@ -338,8 +342,7 @@ while True:
     elif "поменяй язык на клавиатуре" in text.lower():
         choseSayOK()
         keyboard.press_and_release('alt+shift')   
-    
-            
+                
     elif "стоп" in text.lower():
         speak("До свидания.")
-        sys.exit(0)
+        killProg()
