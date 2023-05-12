@@ -94,6 +94,12 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
       <height>241</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>MS Reference Sans Serif</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
     <property name="styleSheet">
      <string notr="true">background-color: white;</string>
     </property>
