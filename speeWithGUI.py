@@ -12,8 +12,9 @@ import ctypes
 import time
 import threading
 
+
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication,QDialog, QComboBox
 from PyQt5.QtCore import QTimer
 from PyQt5 import uic
 from pathlib import Path
@@ -23,8 +24,14 @@ nltk.download('averaged_perceptron_tagger')
 from nltk import pos_tag
 from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume
 
+
+
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "путь_к_ключу_доступа.json"
+
 class MyCustomError(Exception):
     pass
+
+
 
 def killProg():
     time.sleep(2)
@@ -49,7 +56,6 @@ def restart_program():
     script_path = os.path.realpath(__file__)
     subprocess.call(['python', script_path])
     
-
 def changeVolumeMIN(x):
     # Получение всех устройств воспроизведения звука
     if x>1 or x<0 : x=0.1
@@ -187,21 +193,38 @@ def freeze_button(button, seconds):
     button.setEnabled(False)  # Замораживаем кнопку
     QTimer.singleShot(seconds * 1000, lambda: button.setEnabled(True))
 
+class ChildWindow(QDialog):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi("childWindow.ui", self)
+        
+    def get_combobox_value(self):
+        return self.comboBox.currentText()
+
 class VoiceAssistantApp(QtWidgets.QMainWindow):
     def __init__(self):
         super(VoiceAssistantApp, self).__init__()
         uic.loadUi("speeGUI.ui", self)  # Замените "voice_assistant.ui" на имя вашего файла интерфейса
         self.show()
+        self.child_window = ChildWindow()
         # создаем объект для распознавания речи
         self.r = sr.Recognizer()
         self.i = 0
-        
         # создаем объект для синтеза речи
         self.engine = pyttsx3.init()
-
+        self.voices = self.engine.getProperty('voices')
         # Подключение сигналов кнопок к соответствующим методам
         self.btn_start.clicked.connect(self.start_listening)
         self.btn_stop.clicked.connect(self.stop_listening)
+        self.btn_tool.clicked.connect(self.open_child_window)
+    
+    def access_combobox(self):
+        combobox_value = self.child_window.get_combobox_value()
+        return combobox_value
+    
+    def open_child_window(self):
+        child_window = ChildWindow()
+        child_window.exec_()
         
     def closeEvent(self, event):
         # Вызывается при нажатии кнопки закрытия окна
@@ -229,8 +252,7 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         self.listening=False
         self.start_listening_thread.join()
         self.btn_start.setEnabled(True)
-        
-    
+         
     def append_text(self, text):
         
         self.textChat.insertPlainText(text + "\n")
@@ -242,7 +264,8 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
 
     def speak(self, text):
         self.append_text("Spee: " + text)
-        self.engine.say(text)
+        # self.engine.setProperty('voice', self.voices[0].id)
+        self.engine.say(text,"")
         self.engine.runAndWait()
 
     def listen_for_speech(self):
@@ -252,10 +275,9 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
                 print("Говорите...")
                 self.r.adjust_for_ambient_noise(source, duration=1)
                 self.audio = self.r.listen(source)
-
                 try:
-                    if self.listening:  # Проверка флага на прослушивание
-                        text = self.r.recognize_google(self.audio, language="ru-RU")
+                    if self.listening:  # Проверка флага на прослушивание 
+                        text = self.r.recognize_google (self.audio, language="ru-RU")
                         self.append_text(f"Вы сказали: {text}")
                         print(f"Вы сказали: {text}")
                         self.process_user_input(text)

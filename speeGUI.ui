@@ -33,9 +33,9 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
    <widget class="QPushButton" name="btn_start">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>80</y>
-      <width>256</width>
+      <x>660</x>
+      <y>70</y>
+      <width>111</width>
       <height>23</height>
      </rect>
     </property>
@@ -47,9 +47,9 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>270</y>
-      <width>441</width>
-      <height>21</height>
+      <y>490</y>
+      <width>611</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -59,9 +59,9 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
    <widget class="QPushButton" name="btn_stop">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>40</y>
-      <width>256</width>
+      <x>660</x>
+      <y>30</y>
+      <width>111</width>
       <height>23</height>
      </rect>
     </property>
@@ -72,9 +72,9 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
    <widget class="QPushButton" name="btn_Enter">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>270</y>
-      <width>256</width>
+      <x>660</x>
+      <y>260</y>
+      <width>111</width>
       <height>23</height>
      </rect>
     </property>
@@ -90,8 +90,8 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>441</width>
-      <height>241</height>
+      <width>611</width>
+      <height>451</height>
      </rect>
     </property>
     <property name="font">
@@ -105,6 +105,19 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
     </property>
     <property name="readOnly">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QToolButton" name="btn_tool">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>140</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Настройки</string>
     </property>
    </widget>
   </widget>

@@ -28,6 +28,7 @@ class MyCustomError(Exception):
 
 # функция для преобразования текста в речь
 def speak(text):
+    engine.setProperty("voice", "com.apple.speech.synthesis.voice.Alex")
     engine.say(text)
     engine.runAndWait()
 
