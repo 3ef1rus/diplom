@@ -52,6 +52,12 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
       <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>MS Reference Sans Serif</family>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
     <property name="styleSheet">
      <string notr="true">background-color: white;</string>
     </property>
@@ -111,9 +117,9 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
     <property name="geometry">
      <rect>
       <x>660</x>
-      <y>140</y>
+      <y>110</y>
       <width>111</width>
-      <height>20</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">

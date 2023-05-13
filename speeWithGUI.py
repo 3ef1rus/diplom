@@ -3,7 +3,6 @@ import speech_recognition as sr
 import pyttsx3
 import os
 import nltk
-import pyautogui
 import subprocess
 import webbrowser
 import random
@@ -11,11 +10,12 @@ import keyboard
 import ctypes
 import time
 import threading
+import pyautogui
 
 
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtWidgets import QApplication,QDialog, QComboBox
-from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QApplication,QDialog, QComboBox,QLineEdit
+from PyQt5.QtCore import QTimer,pyqtSignal
 from PyQt5 import uic
 from pathlib import Path
 nltk.download('punkt')
@@ -189,6 +189,11 @@ def choseSayOK():
     random_element = random.choice(my_list)
     return (random_element)
 
+def choseSay():
+    my_list = ["Возможно вы попросили то что я еще не умею", "Я такое не умею", "Я вас не поняла", "Попробуйте сформулировать по другому", "Очень хотелось бы помочь но я вас не поняла","Не понятно"]
+    random_element = random.choice(my_list)
+    return (random_element)
+
 def freeze_button(button, seconds):
     button.setEnabled(False)  # Замораживаем кнопку
     QTimer.singleShot(seconds * 1000, lambda: button.setEnabled(True))
@@ -202,27 +207,45 @@ class ChildWindow(QDialog):
         return self.comboBox.currentText()
 
 class VoiceAssistantApp(QtWidgets.QMainWindow):
+    
     def __init__(self):
         super(VoiceAssistantApp, self).__init__()
-        uic.loadUi("speeGUI.ui", self)  # Замените "voice_assistant.ui" на имя вашего файла интерфейса
+        uic.loadUi("speeGUI.ui", self)  
         self.show()
         self.child_window = ChildWindow()
         # создаем объект для распознавания речи
+        
         self.r = sr.Recognizer()
         self.i = 0
         # создаем объект для синтеза речи
         self.engine = pyttsx3.init()
         self.voices = self.engine.getProperty('voices')
+        self.lineedit_text = threading.Thread(target=self.get_lineedit_text)
         # Подключение сигналов кнопок к соответствующим методам
+        self.lineEnter.returnPressed.connect(self.get_lineedit_text)
         self.btn_start.clicked.connect(self.start_listening)
         self.btn_stop.clicked.connect(self.stop_listening)
         self.btn_tool.clicked.connect(self.open_child_window)
+        self.btn_Enter.clicked.connect(self.get_lineedit_text)
+        
+    def check_thread(self,thread):
+            if self.thread.is_alive():
+                self.thread.join()
     
+    def get_lineedit_text(self):
+        text = self.lineEnter.text()
+        self.lineEnter.clear()
+        print("Текст из LineEdit:", text)
+        self.append_text(f"Вы написали: {text}")
+        self.process_user_input(text)
+                 
     def access_combobox(self):
+        
         combobox_value = self.child_window.get_combobox_value()
         return combobox_value
     
     def open_child_window(self):
+        
         child_window = ChildWindow()
         child_window.exec_()
         
@@ -234,6 +257,7 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         super().closeEvent(event)
     
     def start_listening(self):
+        
         self.textChat.clear()
         self.btn_start.setEnabled(False)
         self.listening=True
@@ -242,11 +266,11 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         self.start_listening_thread.start()
 
     def stop_listening(self):   
+        
         self.stop_listening_thread = threading.Thread(target=self.stop_list_trh)
         self.stop_listening_thread.start()
         
     def stop_list_trh(self):
-        
         
         self.btn_stop.setEnabled(False)
         self.listening=False
@@ -257,15 +281,18 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         
         self.textChat.insertPlainText(text + "\n")
         self.textChat.ensureCursorVisible()
+        # self.check_thread(self.le)
 
     def continuous_listening(self):
+        
         while self.listening:
             self.listen_for_speech()
 
     def speak(self, text):
+        
         self.append_text("Spee: " + text)
         # self.engine.setProperty('voice', self.voices[0].id)
-        self.engine.say(text,"")
+        self.engine.say(text)
         self.engine.runAndWait()
 
     def listen_for_speech(self):
@@ -292,7 +319,7 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
                         self.listen_for_speech()
 
     def process_user_input(self, text):
-
+            
         tokens = word_tokenize(text.lower())
         tags = pos_tag(tokens)
         print(tags)
@@ -408,7 +435,9 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
             
         elif "сверни все окна" in text.lower():
             self.speak(choseSayOK())
-            pyautogui.minimizeAllWindows()
+            pyautogui.keyDown('win')
+            pyautogui.press('d')
+            pyautogui.keyUp('win')
             
         elif "выключи звук" in text.lower():
             self.speak(choseSayOK())
@@ -429,6 +458,12 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         elif "стоп" in text.lower():
             self.speak("До свидания.")
             killProg()
+        
+        else : self.speak(choseSay())
+            
+        
+    
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
