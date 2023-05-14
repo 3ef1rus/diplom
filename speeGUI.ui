@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>825</width>
+    <width>820</width>
     <height>667</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>820</width>
+    <height>667</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>820</width>
+    <height>667</height>
+   </size>
   </property>
   <property name="font">
    <font>
@@ -21,7 +33,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>image/titleImage.png</normaloff>image/titleImage.png</iconset>
+    <normaloff>image/logo.png</normaloff>image/logo.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: qlineargradient(spread:pad, x1:1, y1:1, x2:0, y2:0, stop:0
@@ -33,21 +45,44 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
    <widget class="QPushButton" name="btn_start">
     <property name="geometry">
      <rect>
-      <x>660</x>
-      <y>70</y>
-      <width>111</width>
-      <height>23</height>
+      <x>650</x>
+      <y>120</y>
+      <width>141</width>
+      <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>MS Reference Sans Serif</family>
+      <pointsize>24</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+color: black;
+background-color: rgba(255, 255, 255, 30);
+border: 1px solid rgba(255, 255, 255, 40);
+border-radius: 7px;
+width: 230px;
+height: 50px;}
+
+QPushButton:hover {
+background-color: rgb(255, 255, 255, 30);}
+
+QPushButton:pressed {
+background-color: rgba(255, 255, 255, 40);}</string>
+    </property>
     <property name="text">
-     <string>Start</string>
+     <string>   Start</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEnter">
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>490</y>
+      <y>600</y>
       <width>611</width>
       <height>51</height>
      </rect>
@@ -55,37 +90,82 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
     <property name="font">
      <font>
       <family>MS Reference Sans Serif</family>
-      <pointsize>14</pointsize>
+      <pointsize>20</pointsize>
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: white;</string>
+     <string notr="true">background-color: rgba(255, 255, 255, 30);
+border: 1px solid rgba(255, 255, 255, 40);
+border-radius: 7px;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btn_stop">
     <property name="geometry">
      <rect>
-      <x>660</x>
-      <y>30</y>
-      <width>111</width>
-      <height>23</height>
+      <x>650</x>
+      <y>190</y>
+      <width>141</width>
+      <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>MS Reference Sans Serif</family>
+      <pointsize>24</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+color: black;
+background-color: rgba(255, 255, 255, 30);
+border: 1px solid rgba(255, 255, 255, 40);
+border-radius: 7px;
+width: 230px;
+height: 50px;}
+
+QPushButton:hover {
+background-color: rgb(255, 255, 255, 30);}
+
+QPushButton:pressed {
+background-color: rgba(255, 255, 255, 40);}</string>
+    </property>
     <property name="text">
-     <string>Stop</string>
+     <string>   Stop</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btn_Enter">
     <property name="geometry">
      <rect>
-      <x>660</x>
-      <y>260</y>
-      <width>111</width>
-      <height>23</height>
+      <x>650</x>
+      <y>600</y>
+      <width>141</width>
+      <height>51</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>MS Reference Sans Serif</family>
+      <pointsize>24</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="styleSheet">
-     <string notr="true"/>
+     <string notr="true">QPushButton {
+color: black;
+background-color: rgba(255, 255, 255, 30);
+border: 1px solid rgba(255, 255, 255, 40);
+border-radius: 7px;
+width: 230px;
+height: 50px;}
+
+QPushButton:hover {
+background-color: rgb(255, 255, 255, 30);}
+
+QPushButton:pressed {
+background-color: rgba(255, 255, 255, 40);}</string>
     </property>
     <property name="text">
      <string>Enter</string>
@@ -95,7 +175,7 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>10</y>
+      <y>120</y>
       <width>611</width>
       <height>451</height>
      </rect>
@@ -107,7 +187,9 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: white;</string>
+     <string notr="true">background-color: rgba(255, 255, 255, 30);
+border: 1px solid rgba(255, 255, 255, 40);
+border-radius: 7px;</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -116,14 +198,153 @@ rgba(81, 0, 135, 255), stop: 0.427447 rgba(41, 61, 132, 235), stop:1 rgba(155,
    <widget class="QToolButton" name="btn_tool">
     <property name="geometry">
      <rect>
-      <x>660</x>
-      <y>110</y>
-      <width>111</width>
-      <height>21</height>
+      <x>740</x>
+      <y>10</y>
+      <width>71</width>
+      <height>61</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>MS Reference Sans Serif</family>
+      <pointsize>24</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QToolButton {
+color: black;
+background-color: rgba(255, 255, 255, 30);
+border: 1px solid rgba(255, 255, 255, 40);
+border-radius: 7px;
+width: 230px;
+height: 50px;}
+
+QToolButton:hover {
+background-color: rgb(255, 255, 255, 30);}
+
+QToolButton:pressed {
+background-color: rgba(255, 255, 255, 40);}</string>
+    </property>
     <property name="text">
-     <string>Настройки</string>
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>image/tools.png</normaloff>image/tools.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>64</width>
+      <height>64</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>101</width>
+      <height>91</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgba(255, 255, 255, 30);
+border: 1px solid rgba(255, 255, 255, 40);
+border-radius: 7px;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>image/logo.png</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>30</y>
+      <width>151</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>36</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font-weight: bold;
+font-size: 36pt;
+background-color: none;
+border: none;
+background-color: rgba(255, 255, 255, 30);
+border: 1px solid rgba(255, 255, 255, 40);
+border-radius: 7px;</string>
+    </property>
+    <property name="text">
+     <string>Spee</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>200</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color:none;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>image/mic_off_logo.ico</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignHCenter|Qt::AlignTop</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>660</x>
+      <y>130</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color:none;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>image/mic_on_logo.ico</pixmap>
+    </property>
+    <property name="scaledContents">
+     <bool>true</bool>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignHCenter|Qt::AlignTop</set>
     </property>
    </widget>
   </widget>
