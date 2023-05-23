@@ -11,11 +11,14 @@ import ctypes
 import time
 import threading
 import pyautogui
+import openai
 
-
+from ctypes import cast, POINTER
+from comtypes import CLSCTX_ALL
+from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QApplication,QDialog, QComboBox,QLineEdit
-from PyQt5.QtCore import QTimer,pyqtSignal
+from PyQt5.QtCore import QTimer
 from PyQt5 import uic
 from pathlib import Path
 nltk.download('punkt')
@@ -26,7 +29,6 @@ from pycaw.pycaw import AudioUtilities, ISimpleAudioVolume
 
 
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "путь_к_ключу_доступа.json"
 
 class MyCustomError(Exception):
     pass
@@ -56,51 +58,60 @@ def restart_program():
     script_path = os.path.realpath(__file__)
     subprocess.call(['python', script_path])
     
-def changeVolumeMIN(x):
+def changeVolumeMIN(x=10):
+    if x>100 or x<0 : x=10
     # Получение всех устройств воспроизведения звука
-    if x>1 or x<0 : x=0.1
-    sessions = AudioUtilities.GetAllSessions()
-    # Цикл по всем сессиям и увеличение громкости на 10%
+    devices = AudioUtilities.GetSpeakers()
+    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+    volume = cast(interface, POINTER(IAudioEndpointVolume))
+    current_volume = volume.GetMasterVolumeLevelScalar()
+    # Установить новую громкость в процентах
+    result  = current_volume - (1 * x) / 100
+
     try:
-        for session in sessions:
-            volume = session._ctl.QueryInterface(ISimpleAudioVolume)
-            current_volume = volume.GetMasterVolume()
-            volume.SetMasterVolume(current_volume - x, None)
+        
+        volume.SetMasterVolumeLevelScalar(result, None)
+
     except: print("Ошибка")
 
-def changeVolumeMAX(x):
+def changeVolumeMAX(x=10):
+    if x>100 or x<0 : x=10
     # Получение всех устройств воспроизведения звука
-    if x>1 or x<0 : x=0.1
-    sessions = AudioUtilities.GetAllSessions()
+    devices = AudioUtilities.GetSpeakers()
+    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+    volume = cast(interface, POINTER(IAudioEndpointVolume))
+    current_volume = volume.GetMasterVolumeLevelScalar()
+    # Установить новую громкость в процентах
+    result  = current_volume + (1 * x) / 100
 
-    # Цикл по всем сессиям и увеличение громкости на 10%
     try:
-        for session in sessions:
-            volume = session._ctl.QueryInterface(ISimpleAudioVolume)
-            current_volume = volume.GetMasterVolume()
-            volume.SetMasterVolume(current_volume + x, None)
+        
+        volume.SetMasterVolumeLevelScalar(result, None)
+
     except: print("Ошибка")
     
 def changeVolumeM():
     # Получение всех устройств воспроизведения звука
-    sessions = AudioUtilities.GetAllSessions()
+    devices = AudioUtilities.GetSpeakers()
+    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+    volume = cast(interface, POINTER(IAudioEndpointVolume))
 
-    # Цикл по всем сессиям и увеличение громкости на 10%
     try:
-        for session in sessions:
-            volume = session._ctl.QueryInterface(ISimpleAudioVolume)
-            volume.SetMasterVolume(1.0, None)
+        
+        volume.SetMasterVolumeLevelScalar(1, None)
+
     except: print("Ошибка")
             
 def MuteVolume():
     # Получение всех устройств воспроизведения звука
-    sessions = AudioUtilities.GetAllSessions()
+    devices = AudioUtilities.GetSpeakers()
+    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+    volume = cast(interface, POINTER(IAudioEndpointVolume))
 
-    # Цикл по всем сессиям и увеличение громкости на 10%
     try:
-        for session in sessions:
-            volume = session._ctl.QueryInterface(ISimpleAudioVolume)
-            volume.SetMasterVolume(0, None)
+        
+        volume.SetMasterVolumeLevelScalar(0, None)
+
     except: print("Ошибка")
 
 def createFile(x,name="file"):
@@ -183,6 +194,18 @@ def createFolder(x):
                     break
                 except FileExistsError:
                     i += 1     
+
+def ChatGPTrequest(text):
+    openai.api_key = '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'
+    
+    
+    response = openai.Completion.create(
+        engine='text-davinci-003',  # Используйте GPT-3.5 модель
+        prompt='Ваш текстовый запрос',  # Ваш запрос
+        max_tokens=100   
+    )
+    generated_text = response.choices[0].text.strip()
+    return  generated_text
 
 def choseSayOK():
     my_list = ["Хорошо сейчас сделаю", "Сейчас", "Хорошо", "Угу", "Секунду","Готово","В процессе","Сделаю","Уже делаю"]
@@ -281,7 +304,6 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         
         self.textChat.insertPlainText(text + "\n")
         self.textChat.ensureCursorVisible()
-        # self.check_thread(self.le)
 
     def continuous_listening(self):
         
@@ -336,42 +358,38 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         elif "создай блокнот на рабочем столе" in text.lower():
             self.speak(choseSayOK())
             if "с названием" in text.lower():           
-                for word, tag in reversed(tags):
-                        if tag == 'NN':
-                            x=word
-                            createFile("txt",x)
-                            break
-            else:createFile("txt")
+                string=text.lower()
+                idx=string.find("названием")
+                second_half = string[idx + len("названием"):].strip()
+                createFile("txt",second_half)
+            else:createFile("txt") 
         
         elif "создай word на рабочем столе" in text.lower():
             self.speak(choseSayOK())
             if "с названием" in text.lower():           
-                for word, tag in reversed(tags):
-                        if tag == 'NN':
-                            x=word
-                            createFile("doc",x)
-                            break
-            else: createFile("doc")
+                string=text.lower()
+                idx=string.find("названием")
+                second_half = string[idx + len("названием"):].strip()
+                createFile("doc",second_half)
+            else:createFile("doc")  
             
         elif "создай excel на рабочем столе" in text.lower():
             self.speak(choseSayOK())
-
             if "с названием" in text.lower():           
-                for word, tag in reversed(tags):
-                        if tag == 'NN':
-                            x=word
-                            createFile("xlsx",x)
-                            break
-            else:createFile("xlsx")    
+                string=text.lower()
+                idx=string.find("названием")
+                second_half = string[idx + len("названием"):].strip()
+                createFile("xlsk",second_half)
+            else:createFile("xlsk")      
         
         elif "создай папку на рабочем столе" in text.lower():
             self.speak(choseSayOK())
             if "с названием" in text.lower():           
-                for word, tag in tags:
-                        if tag == 'NN':
-                            x=word
-                            createFolder(x)
-            else:createFolder("")                
+                string=text.lower()
+                idx=string.find("названием")
+                second_half = string[idx + len("названием"):].strip()
+                createFolder(second_half)
+            else:createFolder("")               
                     
         elif "создай презентацию на рабочем столе" in text.lower():
             self.speak(choseSayOK())
@@ -382,6 +400,14 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
                             createFile("pptx",x)
                             break
             else:createFile("pptx")  
+            
+        elif "спроси у помощника" in text.lower():
+            self.speak("Данная функция нуждается в спонсоре")
+            # self.speak(choseSayOK())         
+            # string=text.lower()
+            # idx=string.find("помощника")
+            # second_half = string[idx + len("помощника"):].strip()
+            # self.speak(ChatGPTrequest(second_half))    
             
         elif "открой google" in text.lower():
             self.speak(choseSayOK())
@@ -406,27 +432,43 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
             subprocess.Popen('calc.exe')     
             
         elif "сделай тише" in text.lower():
+            change=0
             for word, tag in tags:
                 if tag == 'CD':
-                    changeVolumeMIN(int(word)/100)
-            self.speak(choseSayOK())
+                    changeVolumeMIN(int(word))
+                    change+=1
+            if change==0:
+                changeVolumeMIN()
+            self.speak(choseSayOK()) 
             
         elif "сделай потише" in text.lower():
+            change=0
             for word, tag in tags:
                 if tag == 'CD':
-                    changeVolumeMIN(int(word)/100)
-            self.speak(choseSayOK())    
+                    changeVolumeMIN(int(word))
+                    change+=1
+            if change==0:
+                changeVolumeMIN()
+            self.speak(choseSayOK()) 
                 
         elif "сделай громче" in text.lower():
+            change=0
             for word, tag in tags:
                 if tag == 'CD':
-                    changeVolumeMAX(int(word)/100)
+                    changeVolumeMAX(int(word))
+                    change+=1
+            if change==0:
+                changeVolumeMAX()
             self.speak(choseSayOK())
 
         elif "сделай погромче" in text.lower():
+            change=0
             for word, tag in tags:
                 if tag == 'CD':
-                    changeVolumeMAX(int(word)/100)
+                    changeVolumeMAX(int(word))
+                    change+=1
+            if change==0:
+                changeVolumeMAX()
             self.speak(choseSayOK())
             
         elif "сделай звук на максимум" in text.lower():
