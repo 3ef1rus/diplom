@@ -18,7 +18,7 @@ from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QApplication,QDialog, QComboBox,QLineEdit
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer,pyqtSignal
 from PyQt5 import uic
 from pathlib import Path
 nltk.download('punkt')
@@ -222,12 +222,35 @@ def freeze_button(button, seconds):
     QTimer.singleShot(seconds * 1000, lambda: button.setEnabled(True))
 
 class ChildWindow(QDialog):
-    def __init__(self):
-        super().__init__()
+    button_clicked = pyqtSignal(str)
+    
+    def __init__(self,parent=None):
+        super().__init__(parent)
         uic.loadUi("childWindow.ui", self)
+        self.setWindowTitle("Настройки")
+        self.btn_Push.clicked.connect(self.send_info)
+    
+    def send_info(self):
+        Rate=self.get_comboRate_value()
+        Volume=self.get_comboVolume_value()
+        info=f"{Rate},{Volume}"
+        self.signal.emit(info)
+    def get_info(self):
+        Rate=self.get_comboRate_value()
+        self.get_comboVolume_value()
+        print(Rate)
         
-    def get_combobox_value(self):
-        return self.comboBox.currentText()
+    def get_comboRate_value(self):
+        Rate=self.comboRate.currentText()
+        return Rate
+    
+    def get_comboVolume_value(self):
+        
+        Volume=self.comboVolume.currentText()
+        return Volume
+    
+
+        
 
 class VoiceAssistantApp(QtWidgets.QMainWindow):
     
@@ -236,8 +259,8 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         uic.loadUi("speeGUI.ui", self)  
         self.show()
         self.child_window = ChildWindow()
-        # создаем объект для распознавания речи
-        
+
+        self.child_window.button_clicked.connect(self.receive_info)
         self.r = sr.Recognizer()
         self.i = 0
         # создаем объект для синтеза речи
@@ -262,10 +285,9 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         self.append_text(f"Вы написали: {text}")
         self.process_user_input(text)
                  
-    def access_combobox(self):
-        
-        combobox_value = self.child_window.get_combobox_value()
-        return combobox_value
+    def receive_info(self,info):
+        print("Получена информация:", info)
+       
     
     def open_child_window(self):
         
@@ -310,10 +332,15 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         while self.listening:
             self.listen_for_speech()
 
+    def settingVoice(self):
+        volume=self.access_comboVolume()
+        rate=self.access_comboRate()
+        self.engine.setProperty('volume', volume)
+        self.engine.setProperty('rate', rate)
+
     def speak(self, text):
         
         self.append_text("Spee: " + text)
-        # self.engine.setProperty('voice', self.voices[0].id)
         self.engine.say(text)
         self.engine.runAndWait()
 
