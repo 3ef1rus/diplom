@@ -1,17 +1,28 @@
-from ctypes import cast, POINTER
-from comtypes import CLSCTX_ALL
-from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+import pyttsx3
 
-def set_volume_percent(percent):
-    # Получить объект управления громкостью
-    devices = AudioUtilities.GetSpeakers()
-    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-    volume = cast(interface, POINTER(IAudioEndpointVolume))
-    current_volume = volume.GetMasterVolumeLevelScalar()
-    print(current_volume)
-    # Установить новую громкость в процентах
-    result  = current_volume - (1 * percent) / 100
-    volume.SetMasterVolumeLevelScalar(result, None)
+def get_available_voice_speeds():
+    engine = pyttsx3.init()
+    speeds = []
 
-# Использование функции для установки громкости в 50 процентов
-set_volume_percent(10)
+    # Получить текущее значение скорости голоса
+    current_speed = engine.getProperty('rate')
+    speeds.append(current_speed)
+
+    # Исследовать другие значения скорости голоса
+    for speed in range(50, 1000, 50):
+        # Установить временную скорость голоса
+        engine.setProperty('rate', speed)
+
+        # Проверить, что скорость голоса была установлена
+        if engine.getProperty('rate') != current_speed:
+            speeds.append(speed)
+
+    return speeds
+
+# Получить список доступных скоростей голоса
+available_speeds = get_available_voice_speeds()
+
+# Вывести список скоростей голоса
+print("Доступные скорости голоса:")
+for speed in available_speeds:
+    print(speed)

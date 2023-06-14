@@ -222,7 +222,7 @@ def freeze_button(button, seconds):
     QTimer.singleShot(seconds * 1000, lambda: button.setEnabled(True))
 
 class ChildWindow(QDialog):
-    button_clicked = pyqtSignal(str)
+    data_changed = pyqtSignal(str)  
     
     def __init__(self,parent=None):
         super().__init__(parent)
@@ -233,14 +233,13 @@ class ChildWindow(QDialog):
     def send_info(self):
         Rate=self.get_comboRate_value()
         Volume=self.get_comboVolume_value()
-        info=f"{Rate},{Volume}"
-        self.signal.emit(info)
-    def get_info(self):
-        Rate=self.get_comboRate_value()
-        self.get_comboVolume_value()
-        print(Rate)
+        data=f"{Rate},{Volume}"
+        self.data_changed.emit(data)
+        self.close()
+
         
     def get_comboRate_value(self):
+        
         Rate=self.comboRate.currentText()
         return Rate
     
@@ -260,7 +259,6 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         self.show()
         self.child_window = ChildWindow()
 
-        self.child_window.button_clicked.connect(self.receive_info)
         self.r = sr.Recognizer()
         self.i = 0
         # создаем объект для синтеза речи
@@ -268,6 +266,7 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         self.voices = self.engine.getProperty('voices')
         self.lineedit_text = threading.Thread(target=self.get_lineedit_text)
         # Подключение сигналов кнопок к соответствующим методам
+        self.child_window.data_changed.connect(self.receive_data)
         self.lineEnter.returnPressed.connect(self.get_lineedit_text)
         self.btn_start.clicked.connect(self.start_listening)
         self.btn_stop.clicked.connect(self.stop_listening)
@@ -285,13 +284,14 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         self.append_text(f"Вы написали: {text}")
         self.process_user_input(text)
                  
-    def receive_info(self,info):
-        print("Получена информация:", info)
-       
-    
+    def receive_data(self,info):
+        self.data=info
+        self.settingVoice()
+        
     def open_child_window(self):
         
         child_window = ChildWindow()
+        child_window.data_changed.connect(self.receive_data)
         child_window.exec_()
         
     def closeEvent(self, event):
@@ -332,11 +332,34 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         while self.listening:
             self.listen_for_speech()
 
+    def access_comboVolume(self):
+        data=self.data
+
+        parts = data.split(",")
+        value_after_comma = parts[1]
+        volume_a=value_after_comma.replace("%", "")
+        volume=int(volume_a)/100
+        return int(volume)
+        
+    def access_comboRate(self):
+        data=self.data
+
+        parts = data.split(",")
+        Rate = parts[0]
+        rate=200
+        if Rate=="1": rate=200
+        elif Rate=="0.5": rate=100
+        elif Rate=="1.5": rate=300
+        elif Rate=="2": rate=500
+        return int(rate)
+        
     def settingVoice(self):
         volume=self.access_comboVolume()
         rate=self.access_comboRate()
         self.engine.setProperty('volume', volume)
         self.engine.setProperty('rate', rate)
+        
+        
 
     def speak(self, text):
         
@@ -421,11 +444,10 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         elif "создай презентацию на рабочем столе" in text.lower():
             self.speak(choseSayOK())
             if "с названием" in text.lower():           
-                for word, tag in reversed(tags):
-                        if tag == 'NN':
-                            x=word
-                            createFile("pptx",x)
-                            break
+                string=text.lower()
+                idx=string.find("названием")
+                second_half = string[idx + len("названием"):].strip()
+                createFile("pptx",second_half)
             else:createFile("pptx")  
             
         elif "спроси у помощника" in text.lower():
@@ -457,6 +479,63 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         elif "открой калькулятор" in text.lower():
             self.speak(choseSayOK())
             subprocess.Popen('calc.exe')     
+            
+        elif "открой проводник" in text.lower():
+            self.speak(choseSayOK())
+            subprocess.run("explorer")     
+            
+        elif "открой word с названием" in text.lower():           
+                string=text.lower()
+                idx=string.find("названием")
+                second_half = string[idx + len("названием"):].strip()
+                desktop_path = Path.home() / "Desktop"
+                file=f"{second_half}.doc"
+                file_path = os.path.join(desktop_path, file)
+                os.startfile(file_path)
+                self.speak(choseSayOK())
+                
+        elif "открой excel с названием" in text.lower():           
+                string=text.lower()
+                idx=string.find("названием")
+                second_half = string[idx + len("названием"):].strip()
+                desktop_path = Path.home() / "Desktop"
+                file=f"{second_half}.xlsk"
+                file_path = os.path.join(desktop_path, file)
+                os.startfile(file_path)
+                self.speak(choseSayOK())  
+            
+        elif "открой блокнот с названием" in text.lower():           
+                string=text.lower()
+                idx=string.find("названием")
+                second_half = string[idx + len("названием"):].strip()
+                desktop_path = Path.home() / "Desktop"
+                file=f"{second_half}.txt"
+                file_path = os.path.join(desktop_path, file)
+                os.startfile(file_path)
+                self.speak(choseSayOK())  
+                
+        elif "открой презентацию с названием" in text.lower():           
+                string=text.lower()
+                idx=string.find("названием")
+                second_half = string[idx + len("названием"):].strip()
+                desktop_path = Path.home() / "Desktop"
+                file=f"{second_half}.pptx"
+                file_path = os.path.join(desktop_path, file)
+                os.startfile(file_path)
+                self.speak(choseSayOK()) 
+                
+        elif "открой папку с названием" in text.lower():           
+                string=text.lower()
+                idx=string.find("названием")
+                second_half = string[idx + len("названием"):].strip()
+                desktop_path = Path.home() / "Desktop"
+                file=f"{second_half}"
+                file_path = os.path.join(desktop_path, file)
+                os.startfile(file_path)
+                self.speak(choseSayOK())      
+            
+              
+        
             
         elif "сделай тише" in text.lower():
             change=0
@@ -523,8 +602,29 @@ class VoiceAssistantApp(QtWidgets.QMainWindow):
         elif "поменяй язык на клавиатуре" in text.lower():
             self.speak(choseSayOK())
             keyboard.press_and_release('alt+shift')   
-                    
-        elif "стоп" in text.lower():
+        
+        elif "что ты умеешь" in text.lower():
+            self.speak("Я умею : 1. Создавать различные типы файлов; 2. Настраивать звук компьютера; 3. Искать информацию в интернете; 4. Открывать различные приложения; 5. Взаимодействовать с окнами; 6. Bluetooth . Если вы хотите узнать подробнее об одной из функций спросите меня , Пример : Расскажи про функцию под номером один.")
+        
+        elif "расскажи про функцию под номером один" in text.lower():
+            self.speak("Я умею создавать такие файлы как : Word; Excel; PowerPoint; Блокнот и папки; Пример : Создай Word на рабочем столе ; если вы хотите добавить свое название файлов измените предложение на :Создай Word на рабочем столе с названием для работы .")
+        
+        elif "расскажи про функцию под номером два" in text.lower():
+            self.speak("Я умею измеять звука на компьютере; Пример : Cделай тише; если вы хотите изменить звук на определенное количество то скажите : Сделай громче на 35% ; так же я могу выключить звук полностью или же выкрутить его на максимум ; Пример : Выключи звук ; Сделай звук на максимум.")
+
+        elif "расскажи про функцию под номером три" in text.lower():
+            self.speak("Я умею искать информацию в google или открывать видео на youtube; Пример: Открой google и найти картинки с котиками ; Открой youtube и найти видео с котиками.")
+
+        elif "расскажи про функцию под номером четыре" in text.lower():
+            self.speak("Я умею открывать различные приложения ; На данный момент их не много то я развиваюсь ; Пример : Открой калькулятор.")
+
+        elif "расскажи про функцию под номером пять" in text.lower():
+            self.speak("Я умею сворачивать все окна на компьютере.")
+
+        elif "расскажи про функцию под номером шесть" in text.lower():
+            self.speak("Я могу открыть открыть окошко Bluetooth в нем находятся устройства к которым вы можете подключиться или найти новые ; Пример : Открой Bluetooth .")
+                
+        elif "завершить работу" in text.lower():
             self.speak("До свидания.")
             killProg()
         
